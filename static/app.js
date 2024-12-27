@@ -69,10 +69,39 @@ function setInitialDate() {
     loadDataForDate(today);
 }
 
-function loadDataForDate(date) {
-    // Here we would typically load data from server
-    // For now, we'll just reset the form
-    resetForm();
+async function loadDataForDate(date) {
+    try {
+        const response = await fetch(`/mood-data?date=${date}&initData=${encodeURIComponent(webapp.initData)}`);
+        const result = await response.json();
+
+        if (result.status === 'success' && result.data) {
+            // Update state
+            currentState = result.data;
+
+            // Update UI
+            moodButtons.forEach(btn => {
+                if (btn.dataset.mood === result.data.mood) {
+                    btn.classList.add('selected');
+                } else {
+                    btn.classList.remove('selected');
+                }
+            });
+
+            achievementInput.value = result.data.achievement || '';
+            result.data.goals.forEach((goal, index) => {
+                goalInputs[index].value = goal || '';
+            });
+        } else {
+            resetForm();
+        }
+    } catch (error) {
+        console.error('Error loading data:', error);
+        webapp.showPopup({
+            title: 'Ошибка',
+            message: 'Не удалось загрузить данные',
+            buttons: [{type: 'ok'}]
+        });
+    }
 }
 
 function resetForm() {
