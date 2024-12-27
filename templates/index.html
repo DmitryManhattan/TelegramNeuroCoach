@@ -1,15 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Telegram Mini App</title>
+    <title>Трекер настроения</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="/static/styles.css">
 </head>
 <body>
     <div class="container">
-        <h1>Hello</h1>
+        <div class="date-selector">
+            <input type="date" id="dateSelector" class="date-input">
+        </div>
+
+        <section class="mood-section">
+            <h2>Мое состояние сегодня</h2>
+            <div class="mood-icons">
+                <button class="mood-btn" data-mood="purple" style="background-color: #9C27B0"></button>
+                <button class="mood-btn" data-mood="blue" style="background-color: #2196F3"></button>
+                <button class="mood-btn" data-mood="turquoise" style="background-color: #009688"></button>
+                <button class="mood-btn" data-mood="green" style="background-color: #4CAF50"></button>
+                <button class="mood-btn" data-mood="yellow" style="background-color: #FFEB3B"></button>
+                <button class="mood-btn" data-mood="orange" style="background-color: #FF9800"></button>
+                <button class="mood-btn" data-mood="red" style="background-color: #F44336"></button>
+            </div>
+        </section>
+
+        <section class="achievement-section">
+            <h2>Мое достижение за последние 24ч</h2>
+            <textarea id="achievement" placeholder="Опишите ваше достижение..." rows="4"></textarea>
+        </section>
+
+        <section class="goals-section">
+            <h2>Мои цели на сегодня</h2>
+            <div class="goals-container">
+                <input type="text" class="goal-input" placeholder="Цель 1">
+                <input type="text" class="goal-input" placeholder="Цель 2">
+                <input type="text" class="goal-input" placeholder="Цель 3">
+            </div>
+        </section>
     </div>
     <script src="/static/app.js"></script>
 </body>
