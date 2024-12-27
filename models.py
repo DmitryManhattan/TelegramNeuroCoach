@@ -17,7 +17,7 @@ class MoodEntry(Base):
     user_id = Column(Integer, nullable=False)
     date = Column(Date, nullable=False)
     mood = Column(String, nullable=True)
-    moodDescription = Column(String, nullable=True)
+    mood_description = Column(String, nullable=True)
     achievement = Column(String, nullable=True)
     goals = Column(JSON, nullable=True)
 
@@ -25,7 +25,7 @@ class MoodEntry(Base):
         return {
             'date': self.date.isoformat(),
             'mood': self.mood,
-            'moodDescription': self.moodDescription,
+            'moodDescription': self.mood_description,  # Keep camelCase in API for frontend
             'achievement': self.achievement,
             'goals': self.goals or ['', '', '']
         }

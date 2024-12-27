@@ -102,6 +102,7 @@ async def webapp_data(request):
             if entry:
                 # Update existing entry
                 entry.mood = data['mood']
+                entry.mood_description = data['moodDescription']
                 entry.achievement = data['achievement']
                 entry.goals = data['goals']
             else:
@@ -110,6 +111,7 @@ async def webapp_data(request):
                     user_id=user_id,
                     date=date,
                     mood=data['mood'],
+                    mood_description=data['moodDescription'],
                     achievement=data['achievement'],
                     goals=data['goals']
                 )
