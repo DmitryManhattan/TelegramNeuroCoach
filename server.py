@@ -4,6 +4,7 @@ import logging
 import pathlib
 import json
 from datetime import datetime
+import urllib.parse
 from sqlalchemy.orm import Session
 from models import SessionLocal, init_db, MoodEntry
 
@@ -31,9 +32,14 @@ async def get_mood_data(request):
     """Get mood data for a specific date and user"""
     try:
         date_str = request.query.get('date')
-        init_data = json.loads(request.query.get('initData', '{}'))
-        user_data = json.loads(init_data.get('user', '{}'))
+        init_data = request.query.get('initData', '')
+
+        # Parse initData properly
+        parsed_data = dict(urllib.parse.parse_qsl(init_data))
+        user_data = json.loads(urllib.parse.unquote(parsed_data.get('user', '{}')))
         user_id = user_data.get('id')
+
+        logger.info(f"Parsed user data: {user_data}")
 
         if not date_str or not user_id:
             return web.json_response({"status": "error", "message": "Missing date or user ID"}, status=400)
@@ -71,10 +77,13 @@ async def webapp_data(request):
         init_data = request_data.get('initData', '')
         data = request_data.get('data', {})
 
-        # Parse user data from initData
-        init_data_dict = dict(pair.split('=') for pair in init_data.split('&'))
-        user_data = json.loads(init_data_dict.get('user', '{}'))
+        # Parse initData properly
+        parsed_data = dict(urllib.parse.parse_qsl(init_data))
+        user_data = json.loads(urllib.parse.unquote(parsed_data.get('user', '{}')))
         user_id = user_data.get('id')
+
+        logger.info(f"Received data: {data}")
+        logger.info(f"User ID: {user_id}")
 
         if not user_id:
             return web.json_response({"status": "error", "message": "User ID not found"}, status=400)
