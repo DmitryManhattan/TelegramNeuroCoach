@@ -58,17 +58,22 @@ async function updateDateHighlights() {
             const cssRules = Object.entries(moodDates).map(([date, mood]) => {
                 const color = moodColorMap[mood];
                 return `
-                    td[data-date="${date}"] { 
+                    td[data-date="${date}"] {
                         background-color: ${color} !important;
                         opacity: 0.3;
                     }
-                    input[type="date"][value="${date}"] {
-                        background: linear-gradient(to right, ${color}33, ${color}33) !important;
+                    td[data-date="${date}"].calendar-highlight::after {
+                        background-color: ${color};
                     }
                 `;
             }).join('\n');
 
             styleEl.textContent = cssRules;
+            
+            // Add highlight class to calendar cells
+            document.querySelectorAll('td[data-date]').forEach(td => {
+                td.classList.add('calendar-highlight');
+            });
 
             // Store mood dates for future reference
             dateSelector.dataset.moodDates = JSON.stringify(moodDates);
