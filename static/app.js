@@ -13,6 +13,7 @@ let currentState = {
 
 // DOM Elements
 const dateSelector = document.getElementById('dateSelector');
+const dateSelectorContainer = document.querySelector('.date-selector');
 const moodButtons = document.querySelectorAll('.mood-btn');
 const moodDescriptionInput = document.getElementById('moodDescription');
 const achievementInput = document.getElementById('achievement');
@@ -26,39 +27,36 @@ document.addEventListener('DOMContentLoaded', () => {
         webapp.ready();
         setupEventListeners();
         setInitialDate();
-        highlightMoodDates(); // Add initial highlighting
+        updateDateHighlights(); // Initialize date highlights
     } catch (error) {
         console.error('Error initializing WebApp:', error);
     }
 });
 
-async function highlightMoodDates() {
+async function updateDateHighlights() {
     try {
         const response = await fetch(`/mood-dates?initData=${encodeURIComponent(webapp.initData)}`);
         const result = await response.json();
 
         if (result.status === 'success') {
-            // Create a style element if it doesn't exist
-            let styleEl = document.getElementById('calendar-highlights');
-            if (!styleEl) {
-                styleEl = document.createElement('style');
-                styleEl.id = 'calendar-highlights';
-                document.head.appendChild(styleEl);
-            }
+            const dates = new Set(result.dates);
+            // Store dates in the dataset for future reference
+            dateSelector.dataset.moodDates = JSON.stringify(Array.from(dates));
 
-            // Generate CSS rules for each date
-            const cssRules = result.dates.map(date => 
-                `input[type="date"][value="${date}"], input[type="date"]::-webkit-calendar-picker-indicator[value="${date}"] { background-color: #90EE90; }`
-            ).join('\n');
-
-            styleEl.textContent = cssRules;
-
-            // Add data attribute for dates with entries
-            const datesSet = new Set(result.dates);
-            dateSelector.dataset.moodDates = JSON.stringify(Array.from(datesSet));
+            // Update current date indicator
+            updateCurrentDateIndicator(dates);
         }
     } catch (error) {
         console.error('Error fetching mood dates:', error);
+    }
+}
+
+function updateCurrentDateIndicator(dates) {
+    const currentDate = dateSelector.value;
+    if (dates.has(currentDate)) {
+        dateSelectorContainer.classList.add('has-entry');
+    } else {
+        dateSelectorContainer.classList.remove('has-entry');
     }
 }
 
@@ -74,11 +72,15 @@ function setupEventListeners() {
     dateSelector.addEventListener('change', (e) => {
         currentState.date = e.target.value;
         loadDataForDate(currentState.date);
+
+        // Update indicator for the new date
+        const dates = new Set(JSON.parse(dateSelector.dataset.moodDates || '[]'));
+        updateCurrentDateIndicator(dates);
     });
 
     // Calendar focus - refresh highlights
     dateSelector.addEventListener('focus', () => {
-        highlightMoodDates();
+        updateDateHighlights();
     });
 
     // Mood selection
@@ -140,6 +142,11 @@ async function loadDataForDate(date) {
             result.data.goals.forEach((goal, index) => {
                 goalInputs[index].value = goal || '';
             });
+
+            // Update date indicator
+            const dates = new Set(JSON.parse(dateSelector.dataset.moodDates || '[]'));
+            dates.add(date);
+            updateCurrentDateIndicator(dates);
         } else {
             resetForm();
         }
@@ -166,6 +173,10 @@ function resetForm() {
         achievement: '',
         goals: ['', '', '']
     };
+
+    // Update date indicator
+    const dates = new Set(JSON.parse(dateSelector.dataset.moodDates || '[]'));
+    updateCurrentDateIndicator(dates);
 }
 
 async function saveData() {
@@ -189,8 +200,8 @@ async function saveData() {
                 message: 'Ваши данные сохранены',
                 buttons: [{type: 'ok'}]
             });
-            // Refresh calendar highlights after saving
-            highlightMoodDates();
+            // Update date highlights after saving
+            updateDateHighlights();
         } else {
             throw new Error('Failed to save data');
         }

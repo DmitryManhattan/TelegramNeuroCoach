@@ -39,6 +39,8 @@ h2 {
 .date-selector {
     margin-bottom: 20px;
     text-align: center;
+    position: relative;
+    display: inline-block;
 }
 
 .date-input {
@@ -47,6 +49,24 @@ h2 {
     border-radius: 8px;
     background-color: var(--tg-theme-bg-color, #ffffff);
     color: var(--tg-theme-text-color, #000000);
+    cursor: pointer;
+}
+
+/* Add dot indicator for dates with entries */
+.date-indicator {
+    width: 8px;
+    height: 8px;
+    background-color: #4CAF50;
+    border-radius: 50%;
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+}
+
+.has-entry .date-indicator {
+    display: block;
 }
 
 /* Add styles for calendar highlighting */
