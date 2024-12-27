@@ -13,7 +13,6 @@ let currentState = {
 
 // DOM Elements
 const dateSelector = document.getElementById('dateSelector');
-const dateSelectorContainer = document.querySelector('.date-selector');
 const moodButtons = document.querySelectorAll('.mood-btn');
 const moodDescriptionInput = document.getElementById('moodDescription');
 const achievementInput = document.getElementById('achievement');
@@ -43,20 +42,15 @@ async function updateDateHighlights() {
             // Store dates in the dataset for future reference
             dateSelector.dataset.moodDates = JSON.stringify(Array.from(dates));
 
-            // Update current date indicator
-            updateCurrentDateIndicator(dates);
+            // Apply the highlight class if the current date has an entry
+            if (dates.has(dateSelector.value)) {
+                dateSelector.classList.add('has-entry');
+            } else {
+                dateSelector.classList.remove('has-entry');
+            }
         }
     } catch (error) {
         console.error('Error fetching mood dates:', error);
-    }
-}
-
-function updateCurrentDateIndicator(dates) {
-    const currentDate = dateSelector.value;
-    if (dates.has(currentDate)) {
-        dateSelectorContainer.classList.add('has-entry');
-    } else {
-        dateSelectorContainer.classList.remove('has-entry');
     }
 }
 
@@ -72,10 +66,7 @@ function setupEventListeners() {
     dateSelector.addEventListener('change', (e) => {
         currentState.date = e.target.value;
         loadDataForDate(currentState.date);
-
-        // Update indicator for the new date
-        const dates = new Set(JSON.parse(dateSelector.dataset.moodDates || '[]'));
-        updateCurrentDateIndicator(dates);
+        updateDateHighlights();
     });
 
     // Calendar focus - refresh highlights
@@ -142,11 +133,6 @@ async function loadDataForDate(date) {
             result.data.goals.forEach((goal, index) => {
                 goalInputs[index].value = goal || '';
             });
-
-            // Update date indicator
-            const dates = new Set(JSON.parse(dateSelector.dataset.moodDates || '[]'));
-            dates.add(date);
-            updateCurrentDateIndicator(dates);
         } else {
             resetForm();
         }
@@ -173,10 +159,6 @@ function resetForm() {
         achievement: '',
         goals: ['', '', '']
     };
-
-    // Update date indicator
-    const dates = new Set(JSON.parse(dateSelector.dataset.moodDates || '[]'));
-    updateCurrentDateIndicator(dates);
 }
 
 async function saveData() {

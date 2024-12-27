@@ -39,49 +39,15 @@ h2 {
 .date-selector {
     margin-bottom: 20px;
     text-align: center;
-    position: relative;
-    display: inline-block;
 }
 
-.date-input {
-    padding: 8px 12px;
-    border: 1px solid var(--tg-theme-button-color, #3390ec);
-    border-radius: 8px;
-    background-color: var(--tg-theme-bg-color, #ffffff);
-    color: var(--tg-theme-text-color, #000000);
+/* Style for calendar date highlighting */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    background-color: transparent;
     cursor: pointer;
 }
 
-/* Add dot indicator for dates with entries */
-.date-indicator {
-    width: 8px;
-    height: 8px;
-    background-color: #4CAF50;
-    border-radius: 50%;
-    position: absolute;
-    bottom: -4px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: none;
-}
-
-.has-entry .date-indicator {
-    display: block;
-}
-
-/* Add styles for calendar highlighting */
-input[type="date"] {
-    position: relative;
-    padding: 8px 12px;
-    border: 1px solid var(--tg-theme-button-color, #3390ec);
-    border-radius: 8px;
-    background-color: var(--tg-theme-bg-color, #ffffff);
-    color: var(--tg-theme-text-color, #000000);
-    cursor: pointer;
-}
-
-/* Style for highlighted dates */
-input[type="date"].has-entry {
+input[type="date"].has-entry::-webkit-calendar-picker-indicator {
     background-color: #90EE90;
 }
 
