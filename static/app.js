@@ -1,3 +1,4 @@
+
 // Initialize Telegram WebApp
 const webapp = window.Telegram.WebApp;
 webapp.expand();
@@ -56,57 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-async function updateDateHighlights() {
-    try {
-        const response = await fetch(`/mood-dates?initData=${encodeURIComponent(webapp.initData)}`);
-        const result = await response.json();
-
-        if (result.status === 'success') {
-            const moodDates = result.mood_dates;
-
-            // Create a style element if it doesn't exist
-            let styleEl = document.getElementById('calendar-highlights');
-            if (!styleEl) {
-                styleEl = document.createElement('style');
-                styleEl.id = 'calendar-highlights';
-                document.head.appendChild(styleEl);
-            }
-
-            // Get all mood buttons to map their colors
-            const moodColorMap = Array.from(moodButtons).reduce((map, btn) => {
-                map[btn.dataset.mood] = getComputedStyle(btn).backgroundColor;
-                return map;
-            }, {});
-
-            // Generate CSS rules for each date
-            const cssRules = Object.entries(moodDates).map(([date, mood]) => {
-                const color = moodColorMap[mood];
-                return `
-                    td[data-date="${date}"] {
-                        background-color: ${color} !important;
-                        opacity: 0.3;
-                    }
-                    td[data-date="${date}"].calendar-highlight::after {
-                        background-color: ${color};
-                    }
-                `;
-            }).join('\n');
-
-            styleEl.textContent = cssRules;
-            
-            // Add highlight class to calendar cells
-            document.querySelectorAll('td[data-date]').forEach(td => {
-                td.classList.add('calendar-highlight');
-            });
-
-            // Store mood dates for future reference
-            dateSelector.dataset.moodDates = JSON.stringify(moodDates);
-        }
-    } catch (error) {
-        console.error('Error fetching mood dates:', error);
-    }
-}
-
 function setupEventListeners() {
     // Dismiss keyboard on container click
     container.addEventListener('click', (e) => {
@@ -144,6 +94,17 @@ function setupEventListeners() {
         });
     });
 
+    // Calendar day click
+    document.getElementById('calendar').addEventListener('click', (e) => {
+        const dayElement = e.target.closest('.calendar-day');
+        if (dayElement) {
+            const selectedDate = dayElement.dataset.date;
+            dateSelector.value = selectedDate;
+            currentState.date = selectedDate;
+            loadDataForDate(selectedDate);
+        }
+    });
+
     // Mood description input
     moodDescriptionInput.addEventListener('input', (e) => {
         currentState.moodDescription = e.target.value;
@@ -163,43 +124,6 @@ function setupEventListeners() {
 
     // Save button
     saveButton.addEventListener('click', saveData);
-
-    // Observe calendar changes
-    const observer = new MutationObserver((mutations) => {
-        mutations.forEach((mutation) => {
-            if (mutation.type === 'childList' && mutation.target.tagName === 'TABLE') {
-                applyMoodColors(mutation.target);
-            }
-        });
-    });
-
-    // Start observing the document for calendar table insertion
-    observer.observe(document.documentElement, {
-        childList: true,
-        subtree: true
-    });
-}
-
-function applyMoodColors(calendarTable) {
-    if (!calendarTable || !dateSelector.dataset.moodDates) return;
-
-    const moodDates = JSON.parse(dateSelector.dataset.moodDates);
-    const moodColorMap = Array.from(moodButtons).reduce((map, btn) => {
-        map[btn.dataset.mood] = getComputedStyle(btn).backgroundColor;
-        return map;
-    }, {});
-
-    // Find all date cells and apply colors
-    const cells = calendarTable.querySelectorAll('td');
-    cells.forEach(cell => {
-        const date = cell.getAttribute('data-date');
-        if (date && moodDates[date]) {
-            const mood = moodDates[date];
-            const color = moodColorMap[mood];
-            cell.style.backgroundColor = color;
-            cell.style.opacity = '0.3';
-        }
-    });
 }
 
 function setInitialDate() {
@@ -219,6 +143,12 @@ async function loadDataForDate(date) {
             moodButtons.forEach(btn => {
                 if (btn.dataset.mood === result.data.mood) {
                     btn.classList.add('selected');
+                    // Update calendar day color
+                    const dayElement = document.querySelector(`.calendar-day[data-date="${date}"]`);
+                    if (dayElement) {
+                        dayElement.style.backgroundColor = getComputedStyle(btn).backgroundColor;
+                        dayElement.style.opacity = '0.3';
+                    }
                 } else {
                     btn.classList.remove('selected');
                 }
@@ -289,5 +219,34 @@ async function saveData() {
             message: 'Не удалось сохранить данные',
             buttons: [{type: 'ok'}]
         });
+    }
+}
+
+async function updateDateHighlights() {
+    try {
+        const response = await fetch(`/mood-dates?initData=${encodeURIComponent(webapp.initData)}`);
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            const moodDates = result.mood_dates;
+            
+            // Get all mood buttons to map their colors
+            const moodColorMap = Array.from(moodButtons).reduce((map, btn) => {
+                map[btn.dataset.mood] = getComputedStyle(btn).backgroundColor;
+                return map;
+            }, {});
+
+            // Update calendar days with stored moods
+            document.querySelectorAll('.calendar-day').forEach(day => {
+                const date = day.dataset.date;
+                const mood = moodDates[date];
+                if (mood) {
+                    day.style.backgroundColor = moodColorMap[mood];
+                    day.style.opacity = '0.3';
+                }
+            });
+        }
+    } catch (error) {
+        console.error('Error fetching mood dates:', error);
     }
 }
