@@ -39,7 +39,7 @@ async def get_mood_data(request):
         user_data = json.loads(urllib.parse.unquote(parsed_data.get('user', '{}')))
         user_id = user_data.get('id')
 
-        logger.info(f"Parsed user data: {user_data}")
+        logger.info(f"Fetching mood data for user {user_id} on date {date_str}")
 
         if not date_str or not user_id:
             return web.json_response({"status": "error", "message": "Missing date or user ID"}, status=400)
@@ -54,11 +54,13 @@ async def get_mood_data(request):
             ).first()
 
             if entry:
+                logger.info(f"Found mood entry for user {user_id} on {date}")
                 return web.json_response({
                     "status": "success",
                     "data": entry.to_dict()
                 })
             else:
+                logger.info(f"No mood entry found for user {user_id} on {date}")
                 return web.json_response({
                     "status": "success",
                     "data": None
