@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', () => {
         webapp.ready();
         setupEventListeners();
         setInitialDate();
-        updateDateHighlights(); // Initialize date highlights
+        updateDateHighlights();
     } catch (error) {
         console.error('Error initializing WebApp:', error);
     }
@@ -49,32 +49,32 @@ async function updateDateHighlights() {
             }
 
             // Get all mood buttons to map their colors
-            const moodColors = {};
-            moodButtons.forEach(btn => {
-                moodColors[btn.dataset.mood] = getComputedStyle(btn).backgroundColor;
-            });
+            const moodColorMap = Array.from(moodButtons).reduce((map, btn) => {
+                map[btn.dataset.mood] = getComputedStyle(btn).backgroundColor;
+                return map;
+            }, {});
 
             // Generate CSS rules for each date with its corresponding mood color
-            const cssRules = Object.entries(moodDates).map(([date, mood]) => 
-                `input[type="date"][value="${date}"]::-webkit-calendar-picker-indicator,
-                 input[type="date"]::-webkit-calendar-picker-indicator[aria-label*="${date}"] {
-                    background-color: ${moodColors[mood]} !important;
-                    opacity: 0.3;
-                }`
-            ).join('\n');
+            const cssRules = Object.entries(moodDates).map(([date, mood]) => `
+                input[type="date"][value="${date}"],
+                input[type="date"][aria-label*="${date}"] {
+                    --mood-color: ${moodColorMap[mood]};
+                }
+            `).join('\n');
 
             styleEl.textContent = cssRules;
 
             // Store mood dates for future reference
             dateSelector.dataset.moodDates = JSON.stringify(moodDates);
 
-            // Apply the highlight class if the current date has an entry
+            // Apply the highlight class and color for the current date
             if (moodDates[dateSelector.value]) {
                 const currentMood = moodDates[dateSelector.value];
-                dateSelector.style.setProperty('--calendar-highlight-color', moodColors[currentMood]);
+                dateSelector.style.setProperty('--mood-color', moodColorMap[currentMood]);
                 dateSelector.classList.add('has-entry');
             } else {
                 dateSelector.classList.remove('has-entry');
+                dateSelector.style.removeProperty('--mood-color');
             }
         }
     } catch (error) {
@@ -144,10 +144,8 @@ async function loadDataForDate(date) {
         const result = await response.json();
 
         if (result.status === 'success' && result.data) {
-            // Update state
             currentState = result.data;
 
-            // Update UI
             moodButtons.forEach(btn => {
                 if (btn.dataset.mood === result.data.mood) {
                     btn.classList.add('selected');
@@ -210,7 +208,6 @@ async function saveData() {
                 message: 'Ваши данные сохранены',
                 buttons: [{type: 'ok'}]
             });
-            // Update date highlights after saving
             updateDateHighlights();
         } else {
             throw new Error('Failed to save data');

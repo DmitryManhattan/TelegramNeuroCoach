@@ -23,23 +23,10 @@ section {
     padding: 16px;
 }
 
-h1 {
-    font-size: 2rem;
-    color: var(--tg-theme-text-color, #000000);
-    margin: 0;
-    padding: 20px;
-}
-
 h2 {
     font-size: 1.2rem;
     margin-bottom: 16px;
     color: var(--tg-theme-text-color, #000000);
-}
-
-/* Style for calendar date highlighting */
-input[type="date"]::-webkit-calendar-picker-indicator {
-    background-color: transparent;
-    cursor: pointer;
 }
 
 .date-selector {
@@ -54,7 +41,30 @@ input[type="date"] {
     background-color: var(--tg-theme-bg-color, #ffffff);
     color: var(--tg-theme-text-color, #000000);
     cursor: pointer;
-    --calendar-highlight-color: transparent;
+}
+
+/* Calendar highlighting styles */
+input[type="date"]::-webkit-datetime-edit {
+    position: relative;
+    padding: 0 10px;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+    position: relative;
+    padding: 0 10px;
+    color: transparent;
+    background: none;
+}
+
+input[type="date"].has-entry::-webkit-calendar-picker-indicator::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--mood-color, transparent);
+    opacity: 0.3;
 }
 
 .mood-icons {
