@@ -1,0 +1,97 @@
+To change the colors in the calendar based on the selected mood color, you'll need to update the CSS for the calendar days dynamically using JavaScript. Here's how you can approach it:
+
+Create a calendar UI: You can create a simple calendar or integrate an existing one.
+Listen for mood button clicks: When a user selects a mood, it will change the color of the calendar.
+Change the background color of the selected date: After the user selects a mood, change the background color of the corresponding date.
+Here's a basic implementation of these steps in your code:
+
+HTML (Add Calendar section)
+First, add a calendar UI section to your existing HTML.
+
+html
+Copy code
+<section class="calendar-section">
+    <h2>Календарь</h2>
+    <div id="calendar"></div>
+</section>
+JavaScript (Update mood and calendar color)
+Modify your app.js to handle mood selection and calendar date updates.
+
+javascript
+Copy code
+document.addEventListener('DOMContentLoaded', function() {
+    const moodButtons = document.querySelectorAll('.mood-btn');
+    const dateSelector = document.getElementById('dateSelector');
+    const calendar = document.getElementById('calendar');
+    let selectedMoodColor = '';
+
+    // Create a basic calendar
+    function createCalendar() {
+        const today = new Date();
+        const currentMonth = today.getMonth();
+        const currentYear = today.getFullYear();
+        
+        // Get the first day of the month
+        const firstDay = new Date(currentYear, currentMonth, 1);
+        const lastDay = new Date(currentYear, currentMonth + 1, 0);
+        const totalDays = lastDay.getDate();
+        
+        let calendarHTML = '';
+        
+        for (let day = 1; day <= totalDays; day++) {
+            calendarHTML += `<div class="calendar-day" data-day="${day}">${day}</div>`;
+        }
+
+        calendar.innerHTML = calendarHTML;
+    }
+
+    // Event listener for mood buttons
+    moodButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            selectedMoodColor = button.style.backgroundColor;
+            // Set mood description
+            const moodDescription = document.getElementById('moodDescription');
+            moodDescription.value = `Ваше состояние: ${button.getAttribute('data-mood')}`;
+        });
+    });
+
+    // Event listener for date selection
+    dateSelector.addEventListener('change', function(event) {
+        const selectedDate = event.target.value;
+        const dayElement = document.querySelector(`.calendar-day[data-day="${new Date(selectedDate).getDate()}"]`);
+        
+        if (dayElement && selectedMoodColor) {
+            dayElement.style.backgroundColor = selectedMoodColor;
+        }
+    });
+
+    // Initialize calendar
+    createCalendar();
+});
+CSS (Optional styles for calendar)
+You can style your calendar days to make it look cleaner.
+
+css
+Copy code
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.calendar-day {
+    padding: 10px;
+    text-align: center;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.calendar-day:hover {
+    background-color: #e0e0e0;
+}
+How it works:
+Mood Selection: When a user clicks on a mood button, the background color of the button is saved in selectedMoodColor.
+Date Selection: When a user selects a date from the date picker, the color of the selected date in the calendar is updated based on the selected mood color.
+This will update the calendar days with the selected mood color. You can expand this to store the mood selection in a database or local storage if you need to persist it.
