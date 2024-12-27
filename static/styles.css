@@ -156,29 +156,16 @@ textarea:focus, .goal-input:focus {
     margin-top: 20px;
 }
 
-.calendar-header {
-    padding: 5px;
-    text-align: center;
-    font-weight: bold;
-    color: var(--tg-theme-hint-color, #999);
-}
-
 .calendar-day {
     padding: 10px;
     text-align: center;
     background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
 }
 
-.calendar-day:not(.empty):hover {
+.calendar-day:hover {
     background-color: var(--tg-theme-hint-color, #e0e0e0);
-}
-
-.calendar-day.empty {
-    background: none;
-    cursor: default;
 }
 
 .calendar-section {
