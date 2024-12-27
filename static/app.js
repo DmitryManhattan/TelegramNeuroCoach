@@ -69,12 +69,6 @@ function setupEventListeners() {
     dateSelector.addEventListener('change', (e) => {
         currentState.date = e.target.value;
         loadDataForDate(currentState.date);
-        updateDateHighlights();
-    });
-
-    // Calendar focus - refresh highlights
-    dateSelector.addEventListener('focus', () => {
-        updateDateHighlights();
     });
 
     // Mood selection
@@ -83,14 +77,6 @@ function setupEventListeners() {
             moodButtons.forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             currentState.mood = btn.dataset.mood;
-            
-            // Update calendar day color
-            const selectedDate = dateSelector.value;
-            const dayElement = document.querySelector(`.calendar-day[data-date="${selectedDate}"]`);
-            if (dayElement) {
-                dayElement.style.backgroundColor = getComputedStyle(btn).backgroundColor;
-                dayElement.style.opacity = '0.3';
-            }
         });
     });
 
@@ -143,12 +129,6 @@ async function loadDataForDate(date) {
             moodButtons.forEach(btn => {
                 if (btn.dataset.mood === result.data.mood) {
                     btn.classList.add('selected');
-                    // Update calendar day color
-                    const dayElement = document.querySelector(`.calendar-day[data-date="${date}"]`);
-                    if (dayElement) {
-                        dayElement.style.backgroundColor = getComputedStyle(btn).backgroundColor;
-                        dayElement.style.opacity = '0.3';
-                    }
                 } else {
                     btn.classList.remove('selected');
                 }
