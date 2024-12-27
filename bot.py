@@ -24,7 +24,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await update.message.reply_text(
-        "Привет! Нажми на кнопку ниже, чтобы открыть трекер настроения:",
+        "Привет! Нажми на кнопку ниже, чтобы открыть трекер состояния:",
         reply_markup=reply_markup
     )
 
