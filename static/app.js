@@ -23,6 +23,19 @@ function createCalendar() {
     
     let calendarHTML = '';
     
+    // Add day headers
+    const days = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
+    days.forEach(day => {
+        calendarHTML += `<div class="calendar-header">${day}</div>`;
+    });
+
+    // Add empty cells for days before the first day of the month
+    const firstDayOfWeek = firstDay.getDay() || 7;
+    for (let i = 1; i < firstDayOfWeek; i++) {
+        calendarHTML += '<div class="calendar-day empty"></div>';
+    }
+    
+    // Add the days
     for (let day = 1; day <= totalDays; day++) {
         const date = new Date(currentYear, currentMonth, day);
         const formattedDate = date.toISOString().split('T')[0];
@@ -69,12 +82,6 @@ function setupEventListeners() {
     dateSelector.addEventListener('change', (e) => {
         currentState.date = e.target.value;
         loadDataForDate(currentState.date);
-        updateDateHighlights();
-    });
-
-    // Calendar focus - refresh highlights
-    dateSelector.addEventListener('focus', () => {
-        updateDateHighlights();
     });
 
     // Mood selection
@@ -84,8 +91,7 @@ function setupEventListeners() {
             btn.classList.add('selected');
             currentState.mood = btn.dataset.mood;
             
-            // Update calendar day color
-            const selectedDate = dateSelector.value;
+            const selectedDate = currentState.date;
             const dayElement = document.querySelector(`.calendar-day[data-date="${selectedDate}"]`);
             if (dayElement) {
                 dayElement.style.backgroundColor = getComputedStyle(btn).backgroundColor;
@@ -97,7 +103,7 @@ function setupEventListeners() {
     // Calendar day click
     document.getElementById('calendar').addEventListener('click', (e) => {
         const dayElement = e.target.closest('.calendar-day');
-        if (dayElement) {
+        if (dayElement && !dayElement.classList.contains('empty')) {
             const selectedDate = dayElement.dataset.date;
             dateSelector.value = selectedDate;
             currentState.date = selectedDate;
@@ -129,6 +135,7 @@ function setupEventListeners() {
 function setInitialDate() {
     const today = new Date().toISOString().split('T')[0];
     dateSelector.value = today;
+    currentState.date = today;
     loadDataForDate(today);
 }
 
@@ -239,10 +246,15 @@ async function updateDateHighlights() {
             // Update calendar days with stored moods
             document.querySelectorAll('.calendar-day').forEach(day => {
                 const date = day.dataset.date;
-                const mood = moodDates[date];
-                if (mood) {
-                    day.style.backgroundColor = moodColorMap[mood];
-                    day.style.opacity = '0.3';
+                if (date) {
+                    const mood = moodDates[date];
+                    if (mood) {
+                        day.style.backgroundColor = moodColorMap[mood];
+                        day.style.opacity = '0.3';
+                    } else {
+                        day.style.backgroundColor = '';
+                        day.style.opacity = '';
+                    }
                 }
             });
         }
