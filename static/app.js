@@ -18,6 +18,7 @@ const moodDescriptionInput = document.getElementById('moodDescription');
 const achievementInput = document.getElementById('achievement');
 const goalInputs = document.querySelectorAll('.goal-input');
 const saveButton = document.getElementById('saveButton');
+const container = document.querySelector('.container');
 
 // Set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -31,6 +32,15 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function setupEventListeners() {
+    // Dismiss keyboard on container click
+    container.addEventListener('click', (e) => {
+        // Check if the click was on the container itself (white space)
+        // and not on any input elements or buttons
+        if (e.target === container) {
+            document.activeElement?.blur();
+        }
+    });
+
     // Date change
     dateSelector.addEventListener('change', (e) => {
         currentState.date = e.target.value;
