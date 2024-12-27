@@ -32,6 +32,7 @@ h2 {
 .date-selector {
     margin-bottom: 20px;
     text-align: center;
+    position: relative;
 }
 
 input[type="date"] {
@@ -41,30 +42,16 @@ input[type="date"] {
     background-color: var(--tg-theme-bg-color, #ffffff);
     color: var(--tg-theme-text-color, #000000);
     cursor: pointer;
-}
-
-/* Calendar highlighting styles */
-input[type="date"]::-webkit-datetime-edit {
     position: relative;
-    padding: 0 10px;
+    z-index: 1;
 }
 
+/* Calendar styling */
 input[type="date"]::-webkit-calendar-picker-indicator {
+    opacity: 0;
     position: relative;
-    padding: 0 10px;
-    color: transparent;
-    background: none;
-}
-
-input[type="date"].has-entry::-webkit-calendar-picker-indicator::before {
-    content: "";
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: var(--mood-color, transparent);
-    opacity: 0.3;
+    z-index: 2;
+    cursor: pointer;
 }
 
 .mood-icons {

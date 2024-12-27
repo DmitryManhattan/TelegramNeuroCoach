@@ -54,28 +54,24 @@ async function updateDateHighlights() {
                 return map;
             }, {});
 
-            // Generate CSS rules for each date with its corresponding mood color
-            const cssRules = Object.entries(moodDates).map(([date, mood]) => `
-                input[type="date"][value="${date}"],
-                input[type="date"][aria-label*="${date}"] {
-                    --mood-color: ${moodColorMap[mood]};
-                }
-            `).join('\n');
+            // Generate CSS rules for each date
+            const cssRules = Object.entries(moodDates).map(([date, mood]) => {
+                const color = moodColorMap[mood];
+                return `
+                    td[data-date="${date}"] { 
+                        background-color: ${color} !important;
+                        opacity: 0.3;
+                    }
+                    input[type="date"][value="${date}"] {
+                        background: linear-gradient(to right, ${color}33, ${color}33) !important;
+                    }
+                `;
+            }).join('\n');
 
             styleEl.textContent = cssRules;
 
             // Store mood dates for future reference
             dateSelector.dataset.moodDates = JSON.stringify(moodDates);
-
-            // Apply the highlight class and color for the current date
-            if (moodDates[dateSelector.value]) {
-                const currentMood = moodDates[dateSelector.value];
-                dateSelector.style.setProperty('--mood-color', moodColorMap[currentMood]);
-                dateSelector.classList.add('has-entry');
-            } else {
-                dateSelector.classList.remove('has-entry');
-                dateSelector.style.removeProperty('--mood-color');
-            }
         }
     } catch (error) {
         console.error('Error fetching mood dates:', error);
@@ -130,6 +126,43 @@ function setupEventListeners() {
 
     // Save button
     saveButton.addEventListener('click', saveData);
+
+    // Observe calendar changes
+    const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+            if (mutation.type === 'childList' && mutation.target.tagName === 'TABLE') {
+                applyMoodColors(mutation.target);
+            }
+        });
+    });
+
+    // Start observing the document for calendar table insertion
+    observer.observe(document.documentElement, {
+        childList: true,
+        subtree: true
+    });
+}
+
+function applyMoodColors(calendarTable) {
+    if (!calendarTable || !dateSelector.dataset.moodDates) return;
+
+    const moodDates = JSON.parse(dateSelector.dataset.moodDates);
+    const moodColorMap = Array.from(moodButtons).reduce((map, btn) => {
+        map[btn.dataset.mood] = getComputedStyle(btn).backgroundColor;
+        return map;
+    }, {});
+
+    // Find all date cells and apply colors
+    const cells = calendarTable.querySelectorAll('td');
+    cells.forEach(cell => {
+        const date = cell.getAttribute('data-date');
+        if (date && moodDates[date]) {
+            const mood = moodDates[date];
+            const color = moodColorMap[mood];
+            cell.style.backgroundColor = color;
+            cell.style.opacity = '0.3';
+        }
+    });
 }
 
 function setInitialDate() {
