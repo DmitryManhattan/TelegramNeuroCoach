@@ -39,6 +39,16 @@ async function updateDateHighlights() {
 
         if (result.status === 'success') {
             const moodDates = result.mood_dates;
+            // Map mood names to their colors
+            const moodColorMap = {
+                'purple': '#9C27B0',
+                'blue': '#2196F3',
+                'turquoise': '#009688',
+                'green': '#4CAF50',
+                'yellow': '#FFEB3B',
+                'orange': '#FF9800',
+                'red': '#F44336'
+            };
 
             // Create a style element if it doesn't exist
             let styleEl = document.getElementById('calendar-highlights');
