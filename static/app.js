@@ -6,6 +6,7 @@ webapp.expand();
 let currentState = {
     date: new Date().toISOString().split('T')[0],
     mood: null,
+    moodDescription: '',
     achievement: '',
     goals: ['', '', '']
 };
@@ -13,8 +14,10 @@ let currentState = {
 // DOM Elements
 const dateSelector = document.getElementById('dateSelector');
 const moodButtons = document.querySelectorAll('.mood-btn');
+const moodDescriptionInput = document.getElementById('moodDescription');
 const achievementInput = document.getElementById('achievement');
 const goalInputs = document.querySelectorAll('.goal-input');
+const saveButton = document.getElementById('saveButton');
 
 // Set up event listeners
 document.addEventListener('DOMContentLoaded', () => {
@@ -22,13 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
         webapp.ready();
         setupEventListeners();
         setInitialDate();
-
-        // Enable main button
-        webapp.MainButton.setText('Сохранить');
-        webapp.MainButton.show();
-
-        // Handle save
-        webapp.MainButton.onClick(saveData);
     } catch (error) {
         console.error('Error initializing WebApp:', error);
     }
@@ -50,6 +46,11 @@ function setupEventListeners() {
         });
     });
 
+    // Mood description input
+    moodDescriptionInput.addEventListener('input', (e) => {
+        currentState.moodDescription = e.target.value;
+    });
+
     // Achievement input
     achievementInput.addEventListener('input', (e) => {
         currentState.achievement = e.target.value;
@@ -61,6 +62,9 @@ function setupEventListeners() {
             currentState.goals[index] = e.target.value;
         });
     });
+
+    // Save button
+    saveButton.addEventListener('click', saveData);
 }
 
 function setInitialDate() {
@@ -87,6 +91,7 @@ async function loadDataForDate(date) {
                 }
             });
 
+            moodDescriptionInput.value = result.data.moodDescription || '';
             achievementInput.value = result.data.achievement || '';
             result.data.goals.forEach((goal, index) => {
                 goalInputs[index].value = goal || '';
@@ -106,12 +111,14 @@ async function loadDataForDate(date) {
 
 function resetForm() {
     moodButtons.forEach(btn => btn.classList.remove('selected'));
+    moodDescriptionInput.value = '';
     achievementInput.value = '';
     goalInputs.forEach(input => input.value = '');
 
     currentState = {
         date: dateSelector.value,
         mood: null,
+        moodDescription: '',
         achievement: '',
         goals: ['', '', '']
     };

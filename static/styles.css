@@ -10,6 +10,7 @@ body {
     padding: 20px;
     max-width: 600px;
     margin: 0 auto;
+    padding-bottom: 80px;
 }
 
 section {
@@ -50,6 +51,7 @@ h2 {
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 10px;
+    margin-bottom: 16px;
 }
 
 .mood-btn {
@@ -91,4 +93,26 @@ textarea:focus, .goal-input:focus {
     display: flex;
     flex-direction: column;
     gap: 10px;
+}
+
+.save-button {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--tg-theme-button-color, #3390ec);
+    color: var(--tg-theme-button-text-color, #ffffff);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 24px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    width: calc(100% - 40px);
+    max-width: 600px;
+    z-index: 100;
+}
+
+.save-button:active {
+    opacity: 0.8;
 }
