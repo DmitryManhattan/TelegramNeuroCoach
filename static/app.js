@@ -39,10 +39,6 @@ async function updateDateHighlights() {
 
         if (result.status === 'success') {
             const moodDates = result.mood_dates;
-            const moodColorMap = Array.from(moodButtons).reduce((map, btn) => {
-                map[btn.dataset.mood] = getComputedStyle(btn).backgroundColor;
-                return map;
-            }, {});
 
             // Create a style element if it doesn't exist
             let styleEl = document.getElementById('calendar-highlights');
