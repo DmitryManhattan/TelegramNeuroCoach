@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, JSON, create_engine
+from sqlalchemy import Column, Integer, BigInteger, String, Date, JSON, create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 import os
@@ -14,7 +14,7 @@ class MoodEntry(Base):
     __tablename__ = 'mood_entries'
 
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, nullable=False)
+    user_id = Column(BigInteger, nullable=False)
     date = Column(Date, nullable=False)
     mood = Column(String, nullable=True)
     mood_description = Column(String, nullable=True)
