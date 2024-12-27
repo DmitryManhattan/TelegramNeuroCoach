@@ -39,10 +39,6 @@ async function updateDateHighlights() {
 
         if (result.status === 'success') {
             const moodDates = result.mood_dates;
-            const moodColorMap = Array.from(moodButtons).reduce((map, btn) => {
-                map[btn.dataset.mood] = getComputedStyle(btn).backgroundColor;
-                return map;
-            }, {});
 
             // Create a style element if it doesn't exist
             let styleEl = document.getElementById('calendar-highlights');
@@ -62,25 +58,17 @@ async function updateDateHighlights() {
             const cssRules = Object.entries(moodDates).map(([date, mood]) => {
                 const color = moodColorMap[mood];
                 return `
-                    td[data-date="${date}"] {
+                    td[data-date="${date}"] { 
                         background-color: ${color} !important;
                         opacity: 0.3;
                     }
-                    [data-calendar-selected-date="${date}"]::before {
-                        background-color: ${color};
+                    input[type="date"][value="${date}"] {
+                        background: linear-gradient(to right, ${color}33, ${color}33) !important;
                     }
                 `;
             }).join('\n');
 
             styleEl.textContent = cssRules;
-
-            // Add data attribute to the date input
-            const currentDate = dateSelector.value;
-            if (moodDates[currentDate]) {
-                dateSelector.setAttribute('data-calendar-selected-date', currentDate);
-            } else {
-                dateSelector.removeAttribute('data-calendar-selected-date');
-            }
 
             // Store mood dates for future reference
             dateSelector.dataset.moodDates = JSON.stringify(moodDates);
