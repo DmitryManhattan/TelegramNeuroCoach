@@ -131,7 +131,7 @@ async def webapp_data(request):
         return web.json_response({"status": "error", "message": str(e)}, status=500)
 
 async def get_user_mood_dates(request):
-    """Get all dates with mood entries for a user"""
+    """Get all dates with mood entries and their moods for a user"""
     try:
         init_data = request.query.get('initData', '')
 
@@ -145,17 +145,17 @@ async def get_user_mood_dates(request):
 
         db = SessionLocal()
         try:
-            # Query all dates for the user
-            entries = db.query(MoodEntry.date).filter(
+            # Query dates and moods for the user
+            entries = db.query(MoodEntry.date, MoodEntry.mood).filter(
                 MoodEntry.user_id == user_id
             ).all()
 
-            # Convert dates to string format
-            dates = [entry[0].isoformat() for entry in entries]
+            # Convert to dictionary with date as key and mood as value
+            mood_dates = {entry[0].isoformat(): entry[1] for entry in entries}
 
             return web.json_response({
                 "status": "success",
-                "dates": dates
+                "mood_dates": mood_dates
             })
         finally:
             db.close()

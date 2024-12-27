@@ -36,19 +36,25 @@ h2 {
     color: var(--tg-theme-text-color, #000000);
 }
 
-.date-selector {
-    margin-bottom: 20px;
-    text-align: center;
-}
-
 /* Style for calendar date highlighting */
 input[type="date"]::-webkit-calendar-picker-indicator {
     background-color: transparent;
     cursor: pointer;
 }
 
-input[type="date"].has-entry::-webkit-calendar-picker-indicator {
-    background-color: #90EE90;
+.date-selector {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+input[type="date"] {
+    padding: 8px 12px;
+    border: 1px solid var(--tg-theme-button-color, #3390ec);
+    border-radius: 8px;
+    background-color: var(--tg-theme-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #000000);
+    cursor: pointer;
+    --calendar-highlight-color: transparent;
 }
 
 .mood-icons {

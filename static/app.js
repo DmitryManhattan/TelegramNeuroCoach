@@ -38,12 +38,40 @@ async function updateDateHighlights() {
         const result = await response.json();
 
         if (result.status === 'success') {
-            const dates = new Set(result.dates);
-            // Store dates in the dataset for future reference
-            dateSelector.dataset.moodDates = JSON.stringify(Array.from(dates));
+            const moodDates = result.mood_dates;
+
+            // Create a style element if it doesn't exist
+            let styleEl = document.getElementById('calendar-highlights');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'calendar-highlights';
+                document.head.appendChild(styleEl);
+            }
+
+            // Get all mood buttons to map their colors
+            const moodColors = {};
+            moodButtons.forEach(btn => {
+                moodColors[btn.dataset.mood] = getComputedStyle(btn).backgroundColor;
+            });
+
+            // Generate CSS rules for each date with its corresponding mood color
+            const cssRules = Object.entries(moodDates).map(([date, mood]) => 
+                `input[type="date"][value="${date}"]::-webkit-calendar-picker-indicator,
+                 input[type="date"]::-webkit-calendar-picker-indicator[aria-label*="${date}"] {
+                    background-color: ${moodColors[mood]} !important;
+                    opacity: 0.3;
+                }`
+            ).join('\n');
+
+            styleEl.textContent = cssRules;
+
+            // Store mood dates for future reference
+            dateSelector.dataset.moodDates = JSON.stringify(moodDates);
 
             // Apply the highlight class if the current date has an entry
-            if (dates.has(dateSelector.value)) {
+            if (moodDates[dateSelector.value]) {
+                const currentMood = moodDates[dateSelector.value];
+                dateSelector.style.setProperty('--calendar-highlight-color', moodColors[currentMood]);
                 dateSelector.classList.add('has-entry');
             } else {
                 dateSelector.classList.remove('has-entry');
