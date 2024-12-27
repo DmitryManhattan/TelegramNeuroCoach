@@ -26,16 +26,45 @@ document.addEventListener('DOMContentLoaded', () => {
         webapp.ready();
         setupEventListeners();
         setInitialDate();
+        highlightMoodDates(); // Add initial highlighting
     } catch (error) {
         console.error('Error initializing WebApp:', error);
     }
 });
 
+async function highlightMoodDates() {
+    try {
+        const response = await fetch(`/mood-dates?initData=${encodeURIComponent(webapp.initData)}`);
+        const result = await response.json();
+
+        if (result.status === 'success') {
+            // Create a style element if it doesn't exist
+            let styleEl = document.getElementById('calendar-highlights');
+            if (!styleEl) {
+                styleEl = document.createElement('style');
+                styleEl.id = 'calendar-highlights';
+                document.head.appendChild(styleEl);
+            }
+
+            // Generate CSS rules for each date
+            const cssRules = result.dates.map(date => 
+                `input[type="date"][value="${date}"], input[type="date"]::-webkit-calendar-picker-indicator[value="${date}"] { background-color: #90EE90; }`
+            ).join('\n');
+
+            styleEl.textContent = cssRules;
+
+            // Add data attribute for dates with entries
+            const datesSet = new Set(result.dates);
+            dateSelector.dataset.moodDates = JSON.stringify(Array.from(datesSet));
+        }
+    } catch (error) {
+        console.error('Error fetching mood dates:', error);
+    }
+}
+
 function setupEventListeners() {
     // Dismiss keyboard on container click
     container.addEventListener('click', (e) => {
-        // Check if the click was on the container itself (white space)
-        // and not on any input elements or buttons
         if (e.target === container) {
             document.activeElement?.blur();
         }
@@ -45,6 +74,11 @@ function setupEventListeners() {
     dateSelector.addEventListener('change', (e) => {
         currentState.date = e.target.value;
         loadDataForDate(currentState.date);
+    });
+
+    // Calendar focus - refresh highlights
+    dateSelector.addEventListener('focus', () => {
+        highlightMoodDates();
     });
 
     // Mood selection
@@ -155,6 +189,8 @@ async function saveData() {
                 message: 'Ваши данные сохранены',
                 buttons: [{type: 'ok'}]
             });
+            // Refresh calendar highlights after saving
+            highlightMoodDates();
         } else {
             throw new Error('Failed to save data');
         }

@@ -49,6 +49,22 @@ h2 {
     color: var(--tg-theme-text-color, #000000);
 }
 
+/* Add styles for calendar highlighting */
+input[type="date"] {
+    position: relative;
+    padding: 8px 12px;
+    border: 1px solid var(--tg-theme-button-color, #3390ec);
+    border-radius: 8px;
+    background-color: var(--tg-theme-bg-color, #ffffff);
+    color: var(--tg-theme-text-color, #000000);
+    cursor: pointer;
+}
+
+/* Style for highlighted dates */
+input[type="date"].has-entry {
+    background-color: #90EE90;
+}
+
 .mood-icons {
     display: flex;
     justify-content: space-between;

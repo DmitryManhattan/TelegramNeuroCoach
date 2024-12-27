@@ -130,6 +130,40 @@ async def webapp_data(request):
         logger.error(f"Error processing WebApp data: {e}")
         return web.json_response({"status": "error", "message": str(e)}, status=500)
 
+async def get_user_mood_dates(request):
+    """Get all dates with mood entries for a user"""
+    try:
+        init_data = request.query.get('initData', '')
+
+        # Parse initData properly
+        parsed_data = dict(urllib.parse.parse_qsl(init_data))
+        user_data = json.loads(urllib.parse.unquote(parsed_data.get('user', '{}')))
+        user_id = user_data.get('id')
+
+        if not user_id:
+            return web.json_response({"status": "error", "message": "User ID not found"}, status=400)
+
+        db = SessionLocal()
+        try:
+            # Query all dates for the user
+            entries = db.query(MoodEntry.date).filter(
+                MoodEntry.user_id == user_id
+            ).all()
+
+            # Convert dates to string format
+            dates = [entry[0].isoformat() for entry in entries]
+
+            return web.json_response({
+                "status": "success",
+                "dates": dates
+            })
+        finally:
+            db.close()
+
+    except Exception as e:
+        logger.error(f"Error getting mood dates: {e}")
+        return web.json_response({"status": "error", "message": str(e)}, status=500)
+
 # Create application
 app = web.Application()
 
@@ -137,6 +171,7 @@ app = web.Application()
 app.router.add_get('/', index)
 app.router.add_get('/mood-data', get_mood_data)
 app.router.add_post('/webapp-data', webapp_data)
+app.router.add_get('/mood-dates', get_user_mood_dates)
 app.router.add_static('/static', BASE_DIR / 'static')
 
 if __name__ == '__main__':
