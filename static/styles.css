@@ -148,3 +148,29 @@ textarea:focus, .goal-input:focus {
 .save-button:active {
     opacity: 0.8;
 }
+
+#calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.calendar-day {
+    padding: 10px;
+    text-align: center;
+    background-color: var(--tg-theme-secondary-bg-color, #f0f0f0);
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.calendar-day:hover {
+    background-color: var(--tg-theme-hint-color, #e0e0e0);
+}
+
+.calendar-section {
+    margin-top: 24px;
+    background-color: var(--tg-theme-bg-color, #ffffff);
+    border-radius: 12px;
+    padding: 16px;
+}

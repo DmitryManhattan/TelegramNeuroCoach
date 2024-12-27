@@ -11,6 +11,29 @@ let currentState = {
     goals: ['', '', '']
 };
 
+function createCalendar() {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay = new Date(currentYear, currentMonth + 1, 0);
+    const totalDays = lastDay.getDate();
+    
+    let calendarHTML = '';
+    
+    for (let day = 1; day <= totalDays; day++) {
+        const date = new Date(currentYear, currentMonth, day);
+        const formattedDate = date.toISOString().split('T')[0];
+        calendarHTML += `<div class="calendar-day" data-date="${formattedDate}">${day}</div>`;
+    }
+
+    const calendar = document.getElementById('calendar');
+    if (calendar) {
+        calendar.innerHTML = calendarHTML;
+    }
+}
+
 // DOM Elements
 const dateSelector = document.getElementById('dateSelector');
 const moodButtons = document.querySelectorAll('.mood-btn');
@@ -26,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         webapp.ready();
         setupEventListeners();
         setInitialDate();
+        createCalendar();
         updateDateHighlights();
     } catch (error) {
         console.error('Error initializing WebApp:', error);
@@ -109,6 +133,14 @@ function setupEventListeners() {
             moodButtons.forEach(b => b.classList.remove('selected'));
             btn.classList.add('selected');
             currentState.mood = btn.dataset.mood;
+            
+            // Update calendar day color
+            const selectedDate = dateSelector.value;
+            const dayElement = document.querySelector(`.calendar-day[data-date="${selectedDate}"]`);
+            if (dayElement) {
+                dayElement.style.backgroundColor = getComputedStyle(btn).backgroundColor;
+                dayElement.style.opacity = '0.3';
+            }
         });
     });
 
